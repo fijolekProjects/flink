@@ -52,18 +52,6 @@ public final class TaskDeploymentDescriptor implements Serializable {
 	/** The ID referencing the attempt to execute the task. */
 	private final ExecutionAttemptID executionId;
 
-	/** The task's name. */
-	private final String taskName;
-
-	/** The task's index in the subtask group. */
-	private final int indexInSubtaskGroup;
-
-	/** The number of sub tasks. */
-	private final int numberOfSubtasks;
-
-	/** Attempt number the task */
-	private final int attemptNumber;
-
 	/** The configuration of the job the task belongs to. */
 	private final Configuration jobConfiguration;
 
@@ -93,33 +81,28 @@ public final class TaskDeploymentDescriptor implements Serializable {
 	private final ExecutionConfig executionConfig;
 
 	private long recoveryTimestamp;
+
+	private TaskInfo taskInfo;
 		
 	/**
 	 * Constructs a task deployment descriptor.
 	 */
 	public TaskDeploymentDescriptor(
 			JobID jobID, JobVertexID vertexID, ExecutionAttemptID executionId,
-			ExecutionConfig executionConfig, String taskName, int indexInSubtaskGroup, int numberOfSubtasks,
-			int attemptNumber, Configuration jobConfiguration, Configuration taskConfiguration,
+			ExecutionConfig executionConfig,
+			Configuration jobConfiguration, Configuration taskConfiguration,
 			String invokableClassName, List<ResultPartitionDeploymentDescriptor> producedPartitions,
 			List<InputGateDeploymentDescriptor> inputGates,
 			List<BlobKey> requiredJarFiles, List<URL> requiredClasspaths,
 			int targetSlotNumber, SerializedValue<StateHandle<?>> operatorState,
-			long recoveryTimestamp) {
+			long recoveryTimestamp, TaskInfo taskInfo) {
 
-		checkArgument(indexInSubtaskGroup >= 0);
-		checkArgument(numberOfSubtasks > indexInSubtaskGroup);
-		checkArgument(targetSlotNumber >= 0);
-		checkArgument(attemptNumber >= 0);
+		checkArgument(targetSlotNumber >= 0); //fixme moze to tez do taskInfo?
 
 		this.jobID = checkNotNull(jobID);
 		this.vertexID = checkNotNull(vertexID);
 		this.executionId = checkNotNull(executionId);
 		this.executionConfig = checkNotNull(executionConfig);
-		this.taskName = checkNotNull(taskName);
-		this.indexInSubtaskGroup = indexInSubtaskGroup;
-		this.numberOfSubtasks = numberOfSubtasks;
-		this.attemptNumber = attemptNumber;
 		this.jobConfiguration = checkNotNull(jobConfiguration);
 		this.taskConfiguration = checkNotNull(taskConfiguration);
 		this.invokableClassName = checkNotNull(invokableClassName);
@@ -130,20 +113,21 @@ public final class TaskDeploymentDescriptor implements Serializable {
 		this.targetSlotNumber = targetSlotNumber;
 		this.operatorState = operatorState;
 		this.recoveryTimestamp = recoveryTimestamp;
+		this.taskInfo = taskInfo;
 	}
 
 	public TaskDeploymentDescriptor(
 			JobID jobID, JobVertexID vertexID, ExecutionAttemptID executionId,
-			ExecutionConfig executionConfig, String taskName, int indexInSubtaskGroup, int numberOfSubtasks,
-			int attemptNumber, Configuration jobConfiguration, Configuration taskConfiguration,
+			ExecutionConfig executionConfig,
+			Configuration jobConfiguration, Configuration taskConfiguration,
 			String invokableClassName, List<ResultPartitionDeploymentDescriptor> producedPartitions,
 			List<InputGateDeploymentDescriptor> inputGates,
 			List<BlobKey> requiredJarFiles, List<URL> requiredClasspaths,
-			int targetSlotNumber) {
+			int targetSlotNumber, TaskInfo taskInfo) {
 
-		this(jobID, vertexID, executionId, executionConfig, taskName, indexInSubtaskGroup,
-				numberOfSubtasks, attemptNumber, jobConfiguration, taskConfiguration, invokableClassName,
-				producedPartitions, inputGates, requiredJarFiles, requiredClasspaths, targetSlotNumber, null, -1);
+		this(jobID, vertexID, executionId, executionConfig,
+				jobConfiguration, taskConfiguration, invokableClassName,
+				producedPartitions, inputGates, requiredJarFiles, requiredClasspaths, targetSlotNumber, null, -1, taskInfo);
 	}
 
 	/**
@@ -172,40 +156,10 @@ public final class TaskDeploymentDescriptor implements Serializable {
 	}
 
 	/**
-	 * Returns the task's name.
-	 */
-	public String getTaskName() {
-		return taskName;
-	}
-
-	/**
-	 * Returns the task's index in the subtask group.
-	 *
-	 * @return the task's index in the subtask group
-	 */
-	public int getIndexInSubtaskGroup() {
-		return indexInSubtaskGroup;
-	}
-
-	/**
-	 * Returns the current number of subtasks.
-	 */
-	public int getNumberOfSubtasks() {
-		return numberOfSubtasks;
-	}
-
-	/**
-	 * Returns the attempt number of the subtask
-	 */
-	public int getAttemptNumber() {
-		return attemptNumber;
-	}
-
-	/**
 	 * Returns the {@link TaskInfo} object for the subtask
 	 */
 	public TaskInfo getTaskInfo() {
-		return new TaskInfo(taskName, indexInSubtaskGroup, numberOfSubtasks, attemptNumber);
+		return this.taskInfo;
 	}
 
 	/**
@@ -259,8 +213,8 @@ public final class TaskDeploymentDescriptor implements Serializable {
 		return String.format("TaskDeploymentDescriptor [job id: %s, job vertex id: %s, " +
 						"execution id: %s, task name: %s (%d/%d), attempt: %d, invokable: %s, " +
 						"produced partitions: %s, input gates: %s]",
-				jobID, vertexID, executionId, taskName, indexInSubtaskGroup, numberOfSubtasks,
-				attemptNumber, invokableClassName, collectionToString(producedPartitions),
+				jobID, vertexID, executionId, taskInfo.getTaskName(), taskInfo.getIndexOfThisSubtask(), taskInfo.getNumberOfParallelSubtasks(),
+				taskInfo.getAttemptNumber(), invokableClassName, collectionToString(producedPartitions),
 				collectionToString(inputGates));
 	}
 

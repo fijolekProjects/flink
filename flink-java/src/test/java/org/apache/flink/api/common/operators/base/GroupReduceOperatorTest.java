@@ -164,7 +164,7 @@ public class GroupReduceOperatorTest implements java.io.Serializable {
 					Integer>("foo", 3), new Tuple2<String, Integer>("bar", 2), new Tuple2<String,
 					Integer>("bar", 4)));
 
-			final TaskInfo taskInfo = new TaskInfo(taskName, 0, 1, 0);
+			final TaskInfo taskInfo = TaskInfo.singleLocalTaskInfo(taskName);
 
 			ExecutionConfig executionConfig = new ExecutionConfig();
 			executionConfig.disableObjectReuse();

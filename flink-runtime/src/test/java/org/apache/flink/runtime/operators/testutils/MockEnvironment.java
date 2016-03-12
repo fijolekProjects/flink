@@ -91,7 +91,7 @@ public class MockEnvironment implements Environment {
 	private final int bufferSize;
 
 	public MockEnvironment(String taskName, long memorySize, MockInputSplitProvider inputSplitProvider, int bufferSize) {
-		this.taskInfo = new TaskInfo(taskName, 0, 1, 0);
+		this.taskInfo = TaskInfo.singleLocalTaskInfo(taskName);
 		this.jobConfiguration = new Configuration();
 		this.taskConfiguration = new Configuration();
 		this.inputs = new LinkedList<InputGate>();

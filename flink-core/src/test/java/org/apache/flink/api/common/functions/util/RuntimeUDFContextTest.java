@@ -36,7 +36,7 @@ import org.junit.Test;
 
 public class RuntimeUDFContextTest {
 
-	private final TaskInfo taskInfo = new TaskInfo("test name", 1, 3, 0);
+	private final TaskInfo taskInfo = new TaskInfo("test name", 1, 3, 0, "localhost");
 
 	@Test
 	public void testBroadcastVariableNotFound() {

@@ -150,7 +150,7 @@ public class StreamingRuntimeContextTest {
 		Environment env = mock(Environment.class);
 		when(env.getUserClassLoader()).thenReturn(StreamingRuntimeContextTest.class.getClassLoader());
 		when(env.getDistributedCacheEntries()).thenReturn(Collections.<String, Future<Path>>emptyMap());
-		when(env.getTaskInfo()).thenReturn(new TaskInfo("test task", 0, 1, 1));
+		when(env.getTaskInfo()).thenReturn(new TaskInfo("test task", 0, 1, 1, "localhost"));
 		return env;
 	}
 }

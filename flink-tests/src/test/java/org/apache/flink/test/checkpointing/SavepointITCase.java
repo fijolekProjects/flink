@@ -318,7 +318,7 @@ public class SavepointITCase extends TestLogger {
 
 				boolean success = false;
 				for (TaskDeploymentDescriptor tdd : taskTdds) {
-					if (tdd.getIndexInSubtaskGroup() == stateForTask.getSubtask()) {
+					if (tdd.getTaskInfo().getIndexOfThisSubtask() == stateForTask.getSubtask()) {
 						success = true;
 
 						errMsg = "Initial operator state mismatch.";

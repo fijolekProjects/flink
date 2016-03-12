@@ -84,6 +84,11 @@ public abstract class AbstractRuntimeUDFContext implements RuntimeContext {
 	}
 
 	@Override
+	public String getHostName() {
+		return taskInfo.getHostName();
+	}
+
+	@Override
 	public int getNumberOfParallelSubtasks() {
 		return taskInfo.getNumberOfParallelSubtasks();
 	}

@@ -48,7 +48,7 @@ public class DummyEnvironment implements Environment {
 	private final ExecutionConfig executionConfig = new ExecutionConfig();
 
 	public DummyEnvironment(String taskName, int numSubTasks, int subTaskIndex) {
-		this.taskInfo = new TaskInfo(taskName, subTaskIndex, numSubTasks, 0);
+		this.taskInfo = new TaskInfo(taskName, subTaskIndex, numSubTasks, 0, "localhost");
 	}
 
 	@Override

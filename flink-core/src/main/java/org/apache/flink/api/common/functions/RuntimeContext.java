@@ -59,6 +59,14 @@ public interface RuntimeContext {
 	String getTaskName();
 
 	/**
+	 * Gets the hostname of the TaskManager. The hostname derives from the fully qualified
+	 * domain name
+	 *
+	 * @return hostname of the TaskManager
+	 */
+	String getHostName();
+
+	/**
 	 * Gets the parallelism with which the parallel task runs.
 	 * 
 	 * @return The parallelism with which the parallel task runs.

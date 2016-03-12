@@ -18,14 +18,11 @@
 
 package org.apache.flink.runtime.executiongraph;
 
-import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.runtime.JobException;
-import org.apache.flink.runtime.blob.BlobKey;
 import org.apache.flink.runtime.deployment.InputChannelDeploymentDescriptor;
 import org.apache.flink.runtime.deployment.InputGateDeploymentDescriptor;
 import org.apache.flink.runtime.deployment.PartialInputChannelDeploymentDescriptor;
 import org.apache.flink.runtime.deployment.ResultPartitionDeploymentDescriptor;
-import org.apache.flink.runtime.deployment.TaskDeploymentDescriptor;
 import org.apache.flink.runtime.execution.ExecutionState;
 import org.apache.flink.runtime.instance.Instance;
 import org.apache.flink.runtime.instance.InstanceConnectionInfo;
@@ -43,14 +40,11 @@ import org.apache.flink.runtime.jobmanager.scheduler.CoLocationGroup;
 import org.apache.flink.runtime.jobmanager.scheduler.NoResourceAvailableException;
 import org.apache.flink.runtime.jobmanager.scheduler.Scheduler;
 
-import org.apache.flink.runtime.state.StateHandle;
-import org.apache.flink.util.SerializedValue;
 import org.slf4j.Logger;
 
 import scala.concurrent.duration.FiniteDuration;
 
 import java.io.Serializable;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -628,53 +622,29 @@ public class ExecutionVertex implements Serializable {
 		getExecutionGraph().notifyExecutionChange(getJobvertexId(), subTaskIndex, executionId, newState, error);
 	}
 
-	/**
-	 * Creates a task deployment descriptor to deploy a subtask to the given target slot.
-	 * 
-	 * TODO: This should actually be in the EXECUTION
-	 */
-	TaskDeploymentDescriptor createDeploymentDescriptor(
-			ExecutionAttemptID executionId,
-			SimpleSlot targetSlot,
-			SerializedValue<StateHandle<?>> operatorState,
-			long recoveryTimestamp,
-			int attemptNumber) {
-
+	public List<ResultPartitionDeploymentDescriptor> getProducedIntermediateResults() {
 		// Produced intermediate results
 		List<ResultPartitionDeploymentDescriptor> producedPartitions = new ArrayList<ResultPartitionDeploymentDescriptor>(resultPartitions.size());
-
 		for (IntermediateResultPartition partition : resultPartitions.values()) {
 			producedPartitions.add(ResultPartitionDeploymentDescriptor.from(partition));
 		}
+		return producedPartitions;
+	}
 
+	public List<InputGateDeploymentDescriptor> getConsumedIntermediateResults(SimpleSlot targetSlot) {
 		// Consumed intermediate results
 		List<InputGateDeploymentDescriptor> consumedPartitions = new ArrayList<InputGateDeploymentDescriptor>();
-
 		for (ExecutionEdge[] edges : inputEdges) {
-			InputChannelDeploymentDescriptor[] partitions = InputChannelDeploymentDescriptor
-					.fromEdges(edges, targetSlot);
-
+			InputChannelDeploymentDescriptor[] partitions = InputChannelDeploymentDescriptor.fromEdges(edges, targetSlot);
 			// If the produced partition has multiple consumers registered, we
 			// need to request the one matching our sub task index.
 			// TODO Refactor after removing the consumers from the intermediate result partitions
 			int numConsumerEdges = edges[0].getSource().getConsumers().get(0).size();
-
 			int queueToRequest = subTaskIndex % numConsumerEdges;
-
 			IntermediateDataSetID resultId = edges[0].getSource().getIntermediateResult().getId();
-
 			consumedPartitions.add(new InputGateDeploymentDescriptor(resultId, queueToRequest, partitions));
 		}
-
-		ExecutionConfig config = getExecutionGraph().getExecutionConfig();
-		List<BlobKey> jarFiles = getExecutionGraph().getRequiredJarFiles();
-		List<URL> classpaths = getExecutionGraph().getRequiredClasspaths();
-
-		return new TaskDeploymentDescriptor(getJobId(), getJobvertexId(), executionId, config, getTaskName(),
-				subTaskIndex, getTotalNumberOfParallelSubtasks(), attemptNumber, getExecutionGraph().getJobConfiguration(),
-				jobVertex.getJobVertex().getConfiguration(), jobVertex.getJobVertex().getInvokableClassName(),
-				producedPartitions, consumedPartitions, jarFiles, classpaths, targetSlot.getRoot().getSlotNumber(),
-				operatorState, recoveryTimestamp);
+		return consumedPartitions;
 	}
 
 	// --------------------------------------------------------------------------------------------

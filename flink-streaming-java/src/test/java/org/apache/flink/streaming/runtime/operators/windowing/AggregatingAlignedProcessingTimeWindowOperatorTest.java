@@ -964,7 +964,7 @@ public class AggregatingAlignedProcessingTimeWindowOperatorTest {
 		when(task.getExecutionConfig()).thenReturn(new ExecutionConfig());
 
 		final Environment env = mock(Environment.class);
-		when(env.getTaskInfo()).thenReturn(new TaskInfo("Test task name", 0, 1, 0));
+		when(env.getTaskInfo()).thenReturn(TaskInfo.singleLocalTaskInfo("Test task name"));
 		when(env.getUserClassLoader()).thenReturn(AggregatingAlignedProcessingTimeWindowOperatorTest.class.getClassLoader());
 		
 		when(task.getEnvironment()).thenReturn(env);

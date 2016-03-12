@@ -24,7 +24,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Encapsulates task-specific information: name, index of subtask, parallelism and attempt number.
+ * Encapsulates task-specific information: name, index of subtask, parallelism, attempt number and hostname.
  */
 @Internal
 public class TaskInfo {
@@ -34,8 +34,9 @@ public class TaskInfo {
 	private final int indexOfSubtask;
 	private final int numberOfParallelSubtasks;
 	private final int attemptNumber;
+	private final String hostName;
 
-	public TaskInfo(String taskName, int indexOfSubtask, int numberOfParallelSubtasks, int attemptNumber) {
+	public TaskInfo(String taskName, int indexOfSubtask, int numberOfParallelSubtasks, int attemptNumber, String hostName) {
 		checkArgument(indexOfSubtask >= 0, "Task index must be a non-negative number.");
 		checkArgument(numberOfParallelSubtasks >= 1, "Parallelism must be a positive number.");
 		checkArgument(indexOfSubtask < numberOfParallelSubtasks, "Task index must be less than parallelism.");
@@ -45,6 +46,11 @@ public class TaskInfo {
 		this.numberOfParallelSubtasks = numberOfParallelSubtasks;
 		this.attemptNumber = attemptNumber;
 		this.taskNameWithSubtasks = taskName + " (" + (indexOfSubtask + 1) + '/' + numberOfParallelSubtasks + ')';
+		this.hostName = hostName;
+	}
+
+	public static TaskInfo singleLocalTaskInfo(String taskName) {
+		return new TaskInfo(taskName, 0, 1, 0, "localhost");
 	}
 
 	/**
@@ -54,6 +60,16 @@ public class TaskInfo {
 	 */
 	public String getTaskName() {
 		return this.taskName;
+	}
+
+	/**
+	 * Gets the hostname of the TaskManager. The hostname derives from the fully qualified
+	 * domain name
+	 *
+	 * @return hostname of the TaskManager
+ 	 */
+	public String getHostName() {
+		return this.hostName;
 	}
 
 	/**

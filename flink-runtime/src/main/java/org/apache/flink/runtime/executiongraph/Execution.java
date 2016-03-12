@@ -20,14 +20,12 @@ package org.apache.flink.runtime.executiongraph;
 
 import akka.dispatch.OnComplete;
 import akka.dispatch.OnFailure;
+import org.apache.flink.api.common.TaskInfo;
 import org.apache.flink.api.common.accumulators.Accumulator;
 import org.apache.flink.runtime.JobException;
 import org.apache.flink.runtime.accumulators.AccumulatorRegistry;
 import org.apache.flink.runtime.accumulators.StringifiedAccumulatorResult;
-import org.apache.flink.runtime.deployment.InputChannelDeploymentDescriptor;
-import org.apache.flink.runtime.deployment.PartialInputChannelDeploymentDescriptor;
-import org.apache.flink.runtime.deployment.ResultPartitionLocation;
-import org.apache.flink.runtime.deployment.TaskDeploymentDescriptor;
+import org.apache.flink.runtime.deployment.*;
 import org.apache.flink.runtime.execution.ExecutionState;
 import org.apache.flink.runtime.instance.Instance;
 import org.apache.flink.runtime.instance.InstanceConnectionInfo;
@@ -36,6 +34,7 @@ import org.apache.flink.runtime.instance.SimpleSlot;
 import org.apache.flink.runtime.io.network.ConnectionID;
 import org.apache.flink.runtime.io.network.partition.ResultPartitionID;
 import org.apache.flink.runtime.jobgraph.IntermediateDataSetID;
+import org.apache.flink.runtime.jobgraph.JobVertex;
 import org.apache.flink.runtime.jobmanager.scheduler.CoLocationConstraint;
 import org.apache.flink.runtime.jobmanager.scheduler.NoResourceAvailableException;
 import org.apache.flink.runtime.jobmanager.scheduler.ScheduledUnit;
@@ -364,7 +363,7 @@ public class Execution implements Serializable {
 						attemptNumber, slot.getInstance().getInstanceConnectionInfo().getHostname()));
 			}
 
-			final TaskDeploymentDescriptor deployment = vertex.createDeploymentDescriptor(attemptId, slot, operatorState, recoveryTimestamp, attemptNumber);
+			final TaskDeploymentDescriptor deployment = createDeploymentDescriptor(slot);
 
 			// register this execution at the execution graph, to receive call backs
 			vertex.getExecutionGraph().registerExecution(this);
@@ -403,6 +402,21 @@ public class Execution implements Serializable {
 			markFailed(t);
 			ExceptionUtils.rethrow(t);
 		}
+	}
+
+	private TaskDeploymentDescriptor createDeploymentDescriptor(SimpleSlot targetSlot) {
+		ExecutionGraph executionGraph = vertex.getExecutionGraph();
+		String hostName = vertex.getCurrentAssignedResourceLocation().getHostname();
+		TaskInfo taskInfo = new TaskInfo(
+				vertex.getTaskName(), vertex.getParallelSubtaskIndex(), vertex.getTotalNumberOfParallelSubtasks(), attemptNumber, hostName
+		);
+		JobVertex jobVertex = vertex.getJobVertex().getJobVertex();
+		return new TaskDeploymentDescriptor(vertex.getJobId(), vertex.getJobvertexId(), attemptId, executionGraph.getExecutionConfig(),
+				executionGraph.getJobConfiguration(), jobVertex.getConfiguration(),
+				jobVertex.getInvokableClassName(),
+				vertex.getProducedIntermediateResults(), vertex.getConsumedIntermediateResults(targetSlot),
+				executionGraph.getRequiredJarFiles(), executionGraph.getRequiredClasspaths(), targetSlot.getRoot().getSlotNumber(),
+				operatorState, recoveryTimestamp, taskInfo);
 	}
 
 	/**

@@ -25,6 +25,7 @@ import akka.japi.Creator;
 import akka.testkit.JavaTestKit;
 import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.common.JobID;
+import org.apache.flink.api.common.TaskInfo;
 import org.apache.flink.configuration.ConfigConstants;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.akka.AkkaUtils;
@@ -161,11 +162,11 @@ public class TaskManagerTest extends TestLogger {
 				final ExecutionConfig executionConfig = new ExecutionConfig();
 
 				final TaskDeploymentDescriptor tdd = new TaskDeploymentDescriptor(jid, vid, eid, executionConfig,
-						"TestTask", 2, 7, 0, new Configuration(), new Configuration(),
+						new Configuration(), new Configuration(),
 						TestInvokableCorrect.class.getName(),
 						Collections.<ResultPartitionDeploymentDescriptor>emptyList(),
 						Collections.<InputGateDeploymentDescriptor>emptyList(),
-						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0);
+						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0, new TaskInfo("TestTask", 2, 7, 0, "localhost"));
 
 
 				new Within(d) {
@@ -262,18 +263,18 @@ public class TaskManagerTest extends TestLogger {
 				final ExecutionAttemptID eid2 = new ExecutionAttemptID();
 
 				final TaskDeploymentDescriptor tdd1 = new TaskDeploymentDescriptor(jid1, vid1, eid1,
-						new ExecutionConfig(), "TestTask1", 1, 5, 0,
+						new ExecutionConfig(),
 						new Configuration(), new Configuration(), TestInvokableBlockingCancelable.class.getName(),
 						Collections.<ResultPartitionDeploymentDescriptor>emptyList(),
 						Collections.<InputGateDeploymentDescriptor>emptyList(),
-						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0);
+						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0, new TaskInfo("TestTask1", 1, 5, 0, "localhost"));
 
 				final TaskDeploymentDescriptor tdd2 = new TaskDeploymentDescriptor(jid2, vid2, eid2,
-						new ExecutionConfig(), "TestTask2", 2, 7, 0,
+						new ExecutionConfig(),
 						new Configuration(), new Configuration(), TestInvokableBlockingCancelable.class.getName(),
 						Collections.<ResultPartitionDeploymentDescriptor>emptyList(),
 						Collections.<InputGateDeploymentDescriptor>emptyList(),
-						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0);
+						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0,  new TaskInfo("TestTask2", 2, 7, 0, "localhost"));
 
 				final ActorGateway tm = taskManager;
 
@@ -395,17 +396,17 @@ public class TaskManagerTest extends TestLogger {
 				final ExecutionAttemptID eid1 = new ExecutionAttemptID();
 				final ExecutionAttemptID eid2 = new ExecutionAttemptID();
 
-				final TaskDeploymentDescriptor tdd1 = new TaskDeploymentDescriptor(jid1, vid1, eid1, new ExecutionConfig(),
-						"TestTask1", 1, 5, 0, new Configuration(), new Configuration(), StoppableInvokable.class.getName(),
+				final TaskDeploymentDescriptor tdd1 =new TaskDeploymentDescriptor(jid1, vid1, eid1, new ExecutionConfig(),
+						new Configuration(), new Configuration(), StoppableInvokable.class.getName(),
 						Collections.<ResultPartitionDeploymentDescriptor>emptyList(),
 						Collections.<InputGateDeploymentDescriptor>emptyList(),
-						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0);
+						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0,  new TaskInfo("TestTask1", 1, 5, 0, "localhost"));
 
-				final TaskDeploymentDescriptor tdd2 = new TaskDeploymentDescriptor(jid2, vid2, eid2, new ExecutionConfig(),
-						"TestTask2", 2, 7, 0, new Configuration(), new Configuration(), TestInvokableBlockingCancelable.class.getName(),
+				final TaskDeploymentDescriptor tdd2 =new TaskDeploymentDescriptor(jid2, vid2, eid2, new ExecutionConfig(),
+						new Configuration(), new Configuration(), TestInvokableBlockingCancelable.class.getName(),
 						Collections.<ResultPartitionDeploymentDescriptor>emptyList(),
 						Collections.<InputGateDeploymentDescriptor>emptyList(),
-						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0);
+						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0,  new TaskInfo("TestTask2", 2, 7, 0, "localhost"));
 
 				final ActorGateway tm = taskManager;
 
@@ -521,19 +522,19 @@ public class TaskManagerTest extends TestLogger {
 				final ExecutionAttemptID eid1 = new ExecutionAttemptID();
 				final ExecutionAttemptID eid2 = new ExecutionAttemptID();
 
-				final TaskDeploymentDescriptor tdd1 = new TaskDeploymentDescriptor(jid, vid1, eid1,
-						new ExecutionConfig(), "Sender", 0, 1, 0,
+				final TaskDeploymentDescriptor tdd1 =new TaskDeploymentDescriptor(jid, vid1, eid1,
+						new ExecutionConfig(),
 						new Configuration(), new Configuration(), Tasks.Sender.class.getName(),
 						Collections.<ResultPartitionDeploymentDescriptor>emptyList(),
 						Collections.<InputGateDeploymentDescriptor>emptyList(),
-						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0);
+						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0,  new TaskInfo("Sender", 0, 1, 0, "localhost"));
 
-				final TaskDeploymentDescriptor tdd2 = new TaskDeploymentDescriptor(jid, vid2, eid2,
-						new ExecutionConfig(), "Receiver", 2, 7, 0,
+				final TaskDeploymentDescriptor tdd2 =new TaskDeploymentDescriptor(jid, vid2, eid2,
+						new ExecutionConfig(),
 						new Configuration(), new Configuration(), Tasks.Receiver.class.getName(),
 						Collections.<ResultPartitionDeploymentDescriptor>emptyList(),
 						Collections.<InputGateDeploymentDescriptor>emptyList(),
-						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0);
+						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0,  new TaskInfo("Receiver", 2, 7, 0, "localhost"));
 
 				new Within(d){
 
@@ -622,18 +623,18 @@ public class TaskManagerTest extends TestLogger {
 								}
 						);
 
-				final TaskDeploymentDescriptor tdd1 = new TaskDeploymentDescriptor(jid, vid1, eid1,
-						new ExecutionConfig(), "Sender", 0, 1, 0,
+				final TaskDeploymentDescriptor tdd1 =new TaskDeploymentDescriptor(jid, vid1, eid1,
+						new ExecutionConfig(),
 						new Configuration(), new Configuration(), Tasks.Sender.class.getName(),
 						irpdd, Collections.<InputGateDeploymentDescriptor>emptyList(), new ArrayList<BlobKey>(),
-						Collections.<URL>emptyList(), 0);
+						Collections.<URL>emptyList(), 0,  new TaskInfo("Sender", 0, 1, 0, "localhost"));
 
-				final TaskDeploymentDescriptor tdd2 = new TaskDeploymentDescriptor(jid, vid2, eid2,
-						new ExecutionConfig(), "Receiver", 2, 7, 0,
+				final TaskDeploymentDescriptor tdd2 =new TaskDeploymentDescriptor(jid, vid2, eid2,
+						new ExecutionConfig(),
 						new Configuration(), new Configuration(), Tasks.Receiver.class.getName(),
 						Collections.<ResultPartitionDeploymentDescriptor>emptyList(),
 						Collections.singletonList(ircdd),
-						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0);
+						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0,  new TaskInfo("Receiver", 2, 7, 0, "localhost"));
 
 				new Within(d) {
 
@@ -763,18 +764,18 @@ public class TaskManagerTest extends TestLogger {
 								}
 						);
 
-				final TaskDeploymentDescriptor tdd1 = new TaskDeploymentDescriptor(jid, vid1, eid1,
-						new ExecutionConfig(), "Sender", 0, 1, 0,
+				final TaskDeploymentDescriptor tdd1 =new TaskDeploymentDescriptor(jid, vid1, eid1,
+						new ExecutionConfig(),
 						new Configuration(), new Configuration(), Tasks.Sender.class.getName(),
 						irpdd, Collections.<InputGateDeploymentDescriptor>emptyList(),
-						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0);
+						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0,  new TaskInfo("Sender", 0, 1, 0, "localhost"));
 
-				final TaskDeploymentDescriptor tdd2 = new TaskDeploymentDescriptor(jid, vid2, eid2,
-						new ExecutionConfig(), "Receiver", 2, 7, 0,
+				final TaskDeploymentDescriptor tdd2 =new TaskDeploymentDescriptor(jid, vid2, eid2,
+						new ExecutionConfig(),
 						new Configuration(), new Configuration(), Tasks.BlockingReceiver.class.getName(),
 						Collections.<ResultPartitionDeploymentDescriptor>emptyList(),
 						Collections.singletonList(ircdd),
-						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0);
+						new ArrayList<BlobKey>(), Collections.<URL>emptyList(), 0,  new TaskInfo("Receiver", 2, 7, 0, "localhost"));
 
 				new Within(d){
 
@@ -909,13 +910,13 @@ public class TaskManagerTest extends TestLogger {
 
 				final TaskDeploymentDescriptor tdd = new TaskDeploymentDescriptor(
 						jid, vid, eid,
-						new ExecutionConfig(), "Receiver", 0, 1, 0,
+						new ExecutionConfig(),
 						new Configuration(), new Configuration(),
 						Tasks.AgnosticReceiver.class.getName(),
 						Collections.<ResultPartitionDeploymentDescriptor>emptyList(),
 						Collections.singletonList(igdd),
 						Collections.<BlobKey>emptyList(),
-						Collections.<URL>emptyList(), 0);
+						Collections.<URL>emptyList(), 0, new TaskInfo("Receiver", 0, 1, 0, "localhost"));
 
 				new Within(d) {
 					@Override
@@ -1003,13 +1004,13 @@ public class TaskManagerTest extends TestLogger {
 						new InputGateDeploymentDescriptor(resultId, 0, icdd);
 
 				final TaskDeploymentDescriptor tdd = new TaskDeploymentDescriptor(
-						jid, vid, eid, new ExecutionConfig(), "Receiver", 0, 1, 0,
+						jid, vid, eid, new ExecutionConfig(),
 						new Configuration(), new Configuration(),
 						Tasks.AgnosticReceiver.class.getName(),
 						Collections.<ResultPartitionDeploymentDescriptor>emptyList(),
 						Collections.singletonList(igdd),
 						Collections.<BlobKey>emptyList(),
-						Collections.<URL>emptyList(), 0);
+						Collections.<URL>emptyList(), 0, new TaskInfo("Receiver", 0, 1, 0, "localhost"));
 
 				new Within(new FiniteDuration(120, TimeUnit.SECONDS)) {
 					@Override
@@ -1080,10 +1081,6 @@ public class TaskManagerTest extends TestLogger {
 						new JobVertexID(),
 						new ExecutionAttemptID(),
 						new ExecutionConfig(),
-						"Task",
-						0,
-						1,
-						0,
 						new Configuration(),
 						new Configuration(),
 						Tasks.BlockingNoOpInvokable.class.getName(),
@@ -1091,7 +1088,8 @@ public class TaskManagerTest extends TestLogger {
 						Collections.<InputGateDeploymentDescriptor>emptyList(),
 						Collections.<BlobKey>emptyList(),
 						Collections.<URL>emptyList(),
-						0);
+						0,
+						TaskInfo.singleLocalTaskInfo("Task"));
 
 				// Submit the task
 				new Within(d) {

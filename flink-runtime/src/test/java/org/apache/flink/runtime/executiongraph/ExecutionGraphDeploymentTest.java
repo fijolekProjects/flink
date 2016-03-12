@@ -113,10 +113,11 @@ public class ExecutionGraphDeploymentTest {
 
 			assertEquals(jobId, descr.getJobID());
 			assertEquals(jid2, descr.getVertexID());
-			assertEquals(3, descr.getIndexInSubtaskGroup());
-			assertEquals(10, descr.getNumberOfSubtasks());
+			assertEquals(3, descr.getTaskInfo().getIndexOfThisSubtask());
+			assertEquals(10, descr.getTaskInfo().getNumberOfParallelSubtasks());
 			assertEquals(BatchTask.class.getName(), descr.getInvokableClassName());
-			assertEquals("v2", descr.getTaskName());
+			assertEquals("v2", descr.getTaskInfo().getTaskName());
+			assertEquals("localhost", descr.getTaskInfo().getHostName());
 
 			List<ResultPartitionDeploymentDescriptor> producedPartitions = descr.getProducedPartitions();
 			List<InputGateDeploymentDescriptor> consumedPartitions = descr.getInputGates();

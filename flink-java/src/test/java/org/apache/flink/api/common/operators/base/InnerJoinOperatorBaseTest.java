@@ -104,7 +104,7 @@ public class InnerJoinOperatorBaseTest implements Serializable {
 		));
 
 		try {
-			final TaskInfo taskInfo = new TaskInfo("op", 0, 1, 0);
+			final TaskInfo taskInfo = TaskInfo.singleLocalTaskInfo("op");
 			ExecutionConfig executionConfig = new ExecutionConfig();
 			executionConfig.disableObjectReuse();
 			List<Tuple2<Double, String>> resultSafe = base.executeOnCollections(inputData1, inputData2, new RuntimeUDFContext(taskInfo, null, executionConfig, new HashMap<String, Future<Path>>(), new HashMap<String, Accumulator<?, ?>>()), executionConfig);
